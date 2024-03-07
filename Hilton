@@ -6,7 +6,7 @@ Income int
 locationId int [ref: > Dim_location.id]
 periodId int [ref: > Dim_period.id]
 categoryId int [ref: > Dim_category.id]
-characteristicId int [ref: > Dim _characteristic.id]
+characteristicId int [ref: > Dim_characteristic.id]
 }
 
 Table Dim_location {
