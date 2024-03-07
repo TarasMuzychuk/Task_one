@@ -1,0 +1,79 @@
+Hilton
+
+
+Table Fact_hotel {
+Income int
+locationId int [ref: > Dim_location.id]
+periodId int [ref: > Dim_period.id]
+categoryId int [ref: > Dim_category.id]
+characteristicId int [ref: > Dim _characteristic.id]
+}
+
+Table Dim_location {
+id int [pk]
+country varcher
+region varcher
+city varcher
+district varcher
+}
+
+Table Dim_period {
+id int [pk]
+day_of_week int
+month int 
+year int
+}
+
+Table Dim_category {
+id int [pk]
+five_stars int
+four_stars int
+three_stars int
+two_stars int
+one_stars int
+no_stars int
+}
+
+Table Dim_characteristic {
+id int [pk]
+sleeping_place char
+TV char
+jacuzzi char
+air_condition char
+Wi_Fi char
+Mini_bar char
+}
+
+C.	У 2021 році для кожної країни та місяця проаналізувати дохід 4-зіркових готелів і сукупний дохід 4-зіркових готелів.
+
+SELECT 
+l.country,
+p.month, 
+c.four_stars,
+h.locationId,
+h.Income,
+sum(h.Income) over (partition by l.country, c.four_stars, h.locationId by p.month rows unbounded preceding) as dohid-4st-hotel_
+
+sum(h.Income) over (partition by l.country, c.four_stars by p.month rows unbounded preceding) as dohid-all4st-hotel
+
+FROM 
+ Fact_hotel h, Dim_location l, Dim_period p, Dim_category c
+WHERE 
+h.locationId=l.id and h.periodId=p.id and h.categoryId=c.id and p.year=2021 and c.four_stars=4
+GROUP BY 
+ l.country, c.four_stars,p.month ,h.locationId,p.year
+
+E.	У 2021 році для кожного готелю проаналізувати загальний дохід від номерів із супутниковим телебаченням та джакузі.
+
+SELECT 
+h.Income,
+c.TV,
+c.jacuzzi,
+sum(h.Income) over ( partition by c.TV, c.jacuzzi) as dohid-za-usloviami
+
+FROM 
+ Fact_hotel h, Dim_location l, Dim_characteristic c , Dim_period p
+WHERE 
+h.locationId=l.id and h. characteristicId=c.id and p.year=2021 and c.TV =’yes’ and c.jacuzzi=’yes’
+GROUP BY 
+c.TV,c.jacuzzi ,p.year
